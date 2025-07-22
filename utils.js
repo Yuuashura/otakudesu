@@ -33,7 +33,7 @@ const utils = {
   },
 
   // Handle HTTP errors consistently
-  handleError: (error, defaultMessage = 'Internal server error') => {
+  handleError: (error, defaultMessage = 'Terjadi Kesalahan Jaringan') => {
     if (error.code === 'ECONNABORTED') {
       return { status: 408, message: 'Request timeout' };
     }
