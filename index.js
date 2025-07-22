@@ -57,29 +57,33 @@ app.use((req, res) => {
   });
 });
 
+
 // Global error handler
 app.use((error, req, res, next) => {
   console.error('Global error:', error);
   res.status(500).json({ 
-    error: 'Internal server error',
+    error: 'Gagal Mengambil data, terjadi kesalahan di server',
     success: false 
   });
 });
 
-// ===== SERVER STARTUP =====
-const server = app.listen(config.port, () => {
-  console.log(`🚀 Otakudesu API running at http://localhost:${config.port}`);
-  console.log(`📊 Cache TTL: ${config.cache.stdTTL}s, Max Keys: ${config.cache.maxKeys}`);
-  console.log(`🛡️  Rate Limit: ${config.rateLimit.max} requests per ${config.rateLimit.windowMs/60000} minutes`);
-});
-
-// Graceful shutdown
-process.on('SIGTERM', () => {
-  console.log('SIGTERM received, shutting down gracefully');
-  server.close(() => {
-    cache.close();
-    process.exit(0);
-  });
-});
-
+// Export for Vercel
 module.exports = app;
+
+// Only start server in non-production environments
+if (process.env.NODE_ENV !== 'production') {
+  const server = app.listen(config.port, () => {
+    console.log(`🚀 Otakudesu API running at http://localhost:${config.port}`);
+    console.log(`📊 Cache TTL: ${config.cache.stdTTL}s, Max Keys: ${config.cache.maxKeys}`);
+    console.log(`🛡️  Rate Limit: ${config.rateLimit.max} requests per ${config.rateLimit.windowMs/60000} minutes`);
+  });
+
+  // Graceful shutdown
+  process.on('SIGTERM', () => {
+    console.log('SIGTERM received, shutting down gracefully');
+    server.close(() => {
+      cache.close();
+      process.exit(0);
+    });
+  });
+}
